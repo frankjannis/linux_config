@@ -1,0 +1,52 @@
+theme = "github_dark_high_contrast"
+
+[keys.insert]
+# C-c = "normal_mode"
+
+[keys.normal]
+C-r = ":reload"
+C-g = [':set mouse false', ":write-all", ":new", ":insert-output lazygit", ":buffer-close!", ":redraw", ":reload-all", ':set mouse true']
+# "C-g" = [
+#     ':set mouse false',
+#     ':insert-output lazygit',
+#     ':redraw',
+#     ':set mouse true',
+#     ':open /tmp/lazygit_out.txt',
+#     'select_all',
+#     'split_selection_on_newline',
+#     'goto_file',
+#     ':buffer-close! /tmp/lazygit_out.txt',
+#     ':sh rm -f /tmp/lazygit_out.txt',
+#     ':rla'
+# ]
+
+"ä" = "switch_to_lowercase"
+"Ä" = "switch_to_uppercase"
+"C-ä" = "switch_case"
+
+"ö" = "collapse_selection"
+"Ö" = "flip_selections"
+
+"X" = "select_line_above"
+
+[editor]
+scrolloff = 15
+default-line-ending = "lf"
+auto-format = false
+
+[editor.cursor-shape]
+insert = "bar"
+
+[editor.lsp]
+display-inlay-hints = true
+
+[editor.statusline]
+left = ["mode", "register", "spinner", "file-name", "read-only-indicator", "file-modification-indicator"]
+right = ["diagnostics", "selections", "position", "file-encoding", "file-line-ending", "file-type"]
+
+[editor.whitespace.render]
+space = "all"
+tab = "all"
+nbsp = "none"
+nnbsp = "none"
+newline = "none"

@@ -1,0 +1,18 @@
+set $dispLeft "eDP-1"
+set $dispMiddle "DP-2"
+set $dispRight "DP-4"
+
+output $dispLeft resolution 1920x1080 position 0,360
+output $dispMiddle resolution 2560x1440 position 1920,0
+output $dispRight resolution 2560x1440 position 4480,0
+
+workspace 3 output $dispRight $dispRight
+workspace 3
+exec $browser
+
+workspace 2 output $dispMiddle $dispRight
+
+workspace 1 output $dispLeft $dispRight
+workspace 1
+
+output * bg $background fill

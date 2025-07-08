@@ -15,3 +15,9 @@ This will move changes inside this repo.
 git restore .
 ```
 will drop those differences.
+
+---
+Inverse:
+```
+stow -D -t ~/.config .
+```

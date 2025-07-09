@@ -10,11 +10,11 @@ set -gx EDITOR helix
 ## Useful aliases
 
 # Replace ls with eza
-alias ls='eza -al --color=always --group-directories-first --icons' # preferred listing
-# alias la='eza -a --color=always --group-directories-first --icons'  # all files and dirs
-# alias ll='eza -l --color=always --group-directories-first --icons'  # long format
-alias lt='eza -aT --color=always --group-directories-first --icons' # tree listing
-# alias l.="eza -a | grep -e '^\.'"                                     # show only dotfiles
+alias ls='eza -l --color=always --group-directories-first --icons' # preferred listing
+alias ll='eza -al --color=always --group-directories-first --icons'  # long format
+alias lt='eza -T --color=always --group-directories-first --icons' # tree listing
+alias lT='eza -aT --color=always --group-directories-first --icons' # tree listing
+alias l.="eza -a | grep -e '^\.'"                                     # show only dotfiles
 
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -29,7 +29,7 @@ alias big="expac -H M '%m\t%n' | sort -h | nl"
 # Cleanup orphaned packages
 alias cleanup='sudo pacman -Rns (pacman -Qtdq)'
 
-# yazi wrapper
+## yazi wrapper
 function y
     set tmp (mktemp -t "yazi-cwd.XXXXXX")
     yazi $argv --cwd-file="$tmp"
@@ -39,4 +39,5 @@ function y
     rm -f -- "$tmp"
 end
 
+## zoxide init
 zoxide init --cmd=cd fish | source

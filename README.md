@@ -1,6 +1,6 @@
 ```
 git clone https://github.com/frankjannis/linux_config.git ~/Documents/linux_config
-cd ~/Documents/
+cd ~/Documents/linux_config
 stow -t ~/.config .
 ```
 

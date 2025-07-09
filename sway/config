@@ -16,7 +16,7 @@ set $browser firefox
 # Capital -C makes the term persistent. (q only exits $explorer)
 set $explorer $term -e fish -C 'y'
 set $menu wmenu-run
-set $background ~/.config/sway/wallpapers/1363709.png
+set $background ~/.config/sway/wallpapers/1371030.png
 set $lock swaylock -c 000000
 
 set $cl_high #009ddc
@@ -269,5 +269,5 @@ mode "$mode_system" {
 }
 bindsym $mod+Shift+e mode "$mode_system"
 
-include ~/.config/sway/notebook
+include ~/.sway_device_conf
 include /etc/sway/config.d/*

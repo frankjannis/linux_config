@@ -4,7 +4,7 @@ theme = "github_dark_high_contrast"
 # C-c = "normal_mode"
 
 [keys.normal]
-C-r = ":reload"
+C-r = ":reload-all"
 C-g = [':set mouse false', ":write-all", ":new", ":insert-output lazygit", ":buffer-close!", ":redraw", ":reload-all", ':set mouse true']
 # "C-g" = [
 #     ':set mouse false',

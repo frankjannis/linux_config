@@ -7,9 +7,12 @@ end
 # set editor
 set -gx EDITOR helix
 
-## Useful aliases
+# PATH
+fish_add_path ~/.cargo/bin
 
-# Replace ls with eza
+# Useful aliases
+
+## Replace ls with eza
 alias ls='eza -l --color=always --group-directories-first --icons' # preferred listing
 alias ll='eza -al --color=always --group-directories-first --icons'  # long format
 alias lt='eza -T --color=always --group-directories-first --icons' # tree listing
@@ -22,14 +25,14 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 
-# Recent installed packages
+## Recent installed packages
 alias rip="expac --timefmt='%Y-%m-%d %T' '%l\t%n %v' | sort | tail -200 | nl"
-# Sort installed packages according to size in MB
+## Sort installed packages according to size in MB
 alias big="expac -H M '%m\t%n' | sort -h | nl"
-# Cleanup orphaned packages
+## Cleanup orphaned packages
 alias cleanup='sudo pacman -Rns (pacman -Qtdq)'
 
-## yazi wrapper
+# yazi wrapper
 function y
     set tmp (mktemp -t "yazi-cwd.XXXXXX")
     yazi $argv --cwd-file="$tmp"
@@ -39,5 +42,5 @@ function y
     rm -f -- "$tmp"
 end
 
-## zoxide init
+# zoxide init
 zoxide init --cmd=cd fish | source

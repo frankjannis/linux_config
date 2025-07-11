@@ -10,6 +10,7 @@ In case the folders already exist under ~/.config, run
 stow --adopt -t ~/.config .
 ```
 This will move changes inside this repo.
+THIS WILL NOT MAKE CLEAN DIR SYMLINKS!
 
 ```
 git restore .

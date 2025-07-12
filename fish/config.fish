@@ -13,11 +13,11 @@ fish_add_path ~/.cargo/bin
 # Useful aliases
 
 ## Replace ls with eza
-alias ls='eza -l --color=always --group-directories-first --icons' # preferred listing
-alias ll='eza -al --color=always --group-directories-first --icons'  # long format
-alias lt='eza -T --color=always --group-directories-first --icons' # tree listing
-alias lT='eza -aT --color=always --group-directories-first --icons' # tree listing
-alias l.="eza -a | grep -e '^\.'"                                     # show only dotfiles
+alias ls='eza -l  --color=always --group-directories-first --icons' # preferred listing
+alias ll='eza -al --color=always --group-directories-first --icons' # long format
+alias lt='eza -T  --color=always --group-directories-first --icons' # tree listing
+alias lT='eza -aT --color=always --group-directories-first --icons' # tree listing long
+alias l.="eza -al | grep -e '^\.'"                                  # show only dotfiles
 
 alias ..='cd ..'
 alias ...='cd ../..'

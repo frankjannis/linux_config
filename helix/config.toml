@@ -6,19 +6,6 @@ theme = "github_dark_high_contrast"
 [keys.normal]
 C-r = ":reload-all"
 C-g = [':set mouse false', ":write-all", ":new", ":insert-output lazygit", ":buffer-close!", ":redraw", ":reload-all", ':set mouse true']
-# "C-g" = [
-#     ':set mouse false',
-#     ':insert-output lazygit',
-#     ':redraw',
-#     ':set mouse true',
-#     ':open /tmp/lazygit_out.txt',
-#     'select_all',
-#     'split_selection_on_newline',
-#     'goto_file',
-#     ':buffer-close! /tmp/lazygit_out.txt',
-#     ':sh rm -f /tmp/lazygit_out.txt',
-#     ':rla'
-# ]
 
 "ä" = "switch_to_lowercase"
 "Ä" = "switch_to_uppercase"

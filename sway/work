@@ -8,9 +8,10 @@ output $dispRight resolution 2560x1440 position 4480,0
 
 workspace 3 output $dispRight $dispRight
 workspace 3
-exec $browser
 
 workspace 2 output $dispMiddle $dispRight
+workspace 2
+exec $browser
 
 workspace 1 output $dispLeft $dispRight
 workspace 1

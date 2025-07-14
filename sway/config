@@ -254,6 +254,8 @@ bar {
     position top
 }
 
+bindsym $mod+p exec grim -g "$(slurp)" - | wl-copy
+
 set $mode_system System: (l) lock, (e) logout, (S) suspend, (r) reboot, (s) shutdown, (R) UEFI
 mode "$mode_system" {
     bindsym l exec $lock, mode "default"

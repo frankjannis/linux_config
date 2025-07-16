@@ -19,3 +19,5 @@ workspace 1
 output * bg $background fill
 
 exec --no-startup-id teamviewer --daemon start
+
+for_window [title="Exacom ResultViewer.*"] floating enable

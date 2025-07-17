@@ -1,0 +1,5 @@
+[mgr]
+append_keymap = [
+    # Goto
+    { on = [ "g", "m" ], run = "cd /mnt", desc = "Go mnt" },
+]

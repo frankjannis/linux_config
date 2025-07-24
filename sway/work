@@ -1,6 +1,6 @@
 set $dispLeft "eDP-1"
-set $dispMiddle "DP-8"
-set $dispRight "DP-11"
+set $dispMiddle "DP-2"
+set $dispRight "DP-4"
 
 output $dispLeft resolution 3840x2400 position 0,360
 output $dispMiddle resolution 2560x1440 position 1920,0

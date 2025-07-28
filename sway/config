@@ -12,7 +12,7 @@ set $up k
 set $right l
 
 set $term kitty
-set $browser firefox
+set $browser brave
 # Capital -C makes the term persistent. (q only exits $explorer)
 set $explorer $term -e fish -C 'y'
 set $menu wmenu-run

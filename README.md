@@ -1,7 +1,7 @@
 ```
 git clone https://github.com/frankjannis/linux_config.git ~/Documents/linux_config
 cd ~/Documents/linux_config
-sudo pacman -Suy --needed --noconfirm --
+sudo pacman -Suy stow --needed --noconfirm
 stow -t ~/.config .
 ```
 

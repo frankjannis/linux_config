@@ -16,6 +16,10 @@ C-g = [':set mouse false', ":write-all", ":new", ":insert-output lazygit", ":buf
 
 "X" = "select_line_above"
 
+[keys.select]
+"ö" = "collapse_selection"
+"Ö" = "flip_selections"
+
 [editor]
 scrolloff = 15
 default-line-ending = "lf"

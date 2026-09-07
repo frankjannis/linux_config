@@ -26,12 +26,12 @@ clone/symlink it to `~/.claude/CLAUDE.md` on each machine so the conventions fol
   then the ripple onto consumers, then detail and tests.
 - Git:
   - Never add Claude as author or co-author. No `Co-Authored-By` trailer, no "Generated with Claude" footer.
-  - Never open a PR or push, and do not ask to.
-  - Never delete or rename my branches.
-  - Squash same-topic or fixup commits. Keep commit messages concise; the diff carries the detail. Keep the
-    minimum commits needed to separate concerns. I handle force pushes.
+  - Branches and PRs are mine, not yours. Never create, switch, merge, push, delete, or rename a branch,
+    and never open or manage a PR. Do not ask to.
+  - Squash same-topic or fixup commits and keep the minimum commits needed to separate concerns, but do
+    not otherwise amend or rewrite existing commits unless I ask (one "commit" = one commit). Keep commit
+    messages concise; the diff carries the detail. I handle force pushes.
 
 ## Models
-- If you are running as Opus 5 (check your own model identity), stop immediately before doing the
-  task and tell me to switch to Opus 4.8.
-- When running as Fable, prefer Opus 4.8 subagents. Use Fable subagents only if really necessary.
+- When running as Fable, dispatch subagents as Opus (or Sonnet for light lookups) whenever that is
+  sufficient; Fable is far more expensive. Use Fable subagents only for work that needs it.

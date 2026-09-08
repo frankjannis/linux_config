@@ -25,6 +25,9 @@ scrolloff = 15
 default-line-ending = "lf"
 auto-format = false
 
+[editor.file-picker]
+hidden = false
+
 [editor.cursor-shape]
 insert = "bar"
 

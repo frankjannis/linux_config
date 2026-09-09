@@ -54,3 +54,5 @@ Ask with the AskUserQuestion tool. While you wait, do the parts that do not depe
 ## Models
 - When you run as Fable, dispatch subagents as Opus, or Sonnet for light lookups, whenever that is
   enough. Fable is far more expensive. Use Fable subagents only for work that needs Fable.
+- When you launch subagents, give me one line per agent: the agent type, the model, and the task in
+  a few words. Say it when you launch them, not only at the end.

@@ -49,6 +49,8 @@ Ask with the AskUserQuestion tool. While you wait, do the parts that do not depe
   or manage a PR. Do not ask to.
 - Squash same-topic and fixup commits. Keep the minimum number of commits that separates concerns.
   Do not otherwise amend or rewrite existing commits unless I ask. One "commit" means one commit.
+- Single commits on a branch do not have to build or pass tests on their own. Only the branch as a
+  whole must build and pass. Do not split or reorder commits to make each one green.
 - Keep commit messages short. The diff carries the detail. I handle force pushes.
 
 ## Models

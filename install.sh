@@ -18,14 +18,20 @@ for a in "$@"; do
     esac
 done
 
-# Ensure $1 exists as real directories. Remove any symlink standing in for a path
-# component (e.g. a folded stow package link, maybe now dangling) so files land in the
-# real tree instead of being written through a stale link.
+# Ensure $1 exists as real directories. Drop a dangling directory symlink standing in for a
+# path component (e.g. a folded stow package link that no longer resolves) so files land in
+# the real tree instead of being written through a stale link. Valid symlinks and plain files
+# are left alone, and a plain file blocking a needed directory aborts with a clear message.
 ensure_dir() {
     dir=$1
     p=$dir
     while [ -n "$p" ] && [ "$p" != "/" ] && [ "$p" != "." ]; do
-        [ -L "$p" ] && rm -- "$p"
+        if [ -L "$p" ]; then
+            [ -e "$p" ] || rm -- "$p"
+        elif [ -e "$p" ] && [ ! -d "$p" ]; then
+            echo "error: $p is in the way and is not a directory" >&2
+            exit 1
+        fi
         parent=${p%/*}
         [ "$parent" = "$p" ] && break
         p=$parent
@@ -59,7 +65,7 @@ link_root config "$HOME/.config"
 link_root home "$HOME"
 
 if [ "$restore" -eq 1 ]; then
-    git -C "$repo" checkout HEAD -- .
+    git -C "$repo" restore --source=HEAD --staged --worktree .
     echo "Linked. Adopted changes dropped; repo and live config now at the committed version."
 else
     echo "Linked. Pre-existing files were adopted into the repo; review with: git -C \"$repo\" status"

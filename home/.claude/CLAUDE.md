@@ -5,9 +5,9 @@ on this machine. The file lives in my dotfiles repo and is symlinked to `~/.clau
 
 ## Ask before you spend tokens
 
-**IMPORTANT: Do not spend many tokens on work I may not want. When the direction is unclear, ask
-first.** A question costs a few tokens. A large piece of unwanted work costs many tokens plus my time
-to review and undo it.
+Do not spend many tokens on work I may not want. When the direction is unclear, ask first. A
+question costs a few tokens. A large piece of unwanted work costs many tokens plus my time to review
+and undo it.
 
 Ask when both are true:
 - the answer changes the work in a material way (different scope, design, or files), and
@@ -20,6 +20,8 @@ Ask with the AskUserQuestion tool. While you wait, do the parts that do not depe
 - Write in Simplified Technical English (ASD-STE100): short sentences, plain words, one idea per sentence.
 - No em-dashes. No emojis. This applies to prose, code, comments, and commit messages.
 - Prefix each review finding, question, or item I may refer to later with a unique ID (F1, Q1, ...).
+  I need these IDs to tell you what to do. Put the ID in every field I see. For the ReportFindings
+  tool, the table shows `short_summary`, so start it with the ID ("F1: ...").
 - Present choices with the AskUserQuestion tool, never as a free-text option list.
 - Reviews and walkthroughs: order sections top-down by altitude. Keystone decision, then interfaces
   and seams, then the effect on consumers, then detail and tests.

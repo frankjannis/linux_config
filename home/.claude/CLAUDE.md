@@ -43,7 +43,6 @@ Ask with the AskUserQuestion tool. While you wait, do the parts that do not depe
   before you state it as fact.
 - Do not over-verify unless I ask. Run the existing test harness and unit tests. Do not loop on
   verification before you present a solution.
-- Write new tests separately from feature work.
 
 ## Git
 - Never add Claude as author or co-author. No `Co-Authored-By` trailer, no "Generated with Claude" footer.

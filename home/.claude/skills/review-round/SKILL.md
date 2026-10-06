@@ -14,8 +14,9 @@ never reviews it: every review and every verification is done by a fresh agent.
 - Path: `.agents/review/<branch>.md` in the repo root, `/` in the branch name replaced by `-`.
   If `git check-ignore -q .agents/x` fails, append `.agents/` to
   `$(git rev-parse --git-common-dir)/info/exclude`. Never commit the ledger.
-- A new ledger records the base (`git merge-base origin/main HEAD` unless I name another), a
-  findings table and a rounds log.
+- A new ledger records the base, a findings table and a rounds log. The base is
+  `git merge-base <default> HEAD`, unless I name another. `<default>` is
+  `git symbolic-ref -q --short refs/remotes/origin/HEAD`, or `origin/main` when that is not set.
   - Findings: ID, status (`open`, `fixed`, `rejected`, `deferred`), `file:line`, the finding in one
     line, and my reason for a rejection or deferral. IDs are `F1`, `F2`, ... and continue across
     rounds.
@@ -28,44 +29,64 @@ never reviews it: every review and every verification is done by a fresh agent.
   - Round 1 is full.
   - A later round is delta, unless the last round was a delta round that found nothing above a nit.
     Then this round is full: it is the final check of the whole branch.
-  - Both include uncommitted changes.
+  - A round is also full when the last head is no longer in the branch
+    (`git merge-base --is-ancestor <last head> HEAD` fails, after a squash or a rebase). Say why.
+  - Both include uncommitted changes, untracked files too.
 - If the scope is empty and no entry is `open`, stop: say the branch has nothing new.
-- Write the uncommitted changes to a patch in the scratchpad: `git diff --binary HEAD > <patch>`.
+- Write the uncommitted changes, untracked files included, to a patch in the scratchpad through a
+  temporary index, so my real index stays as it is: copy `$(git rev-parse --git-path index)` to
+  `<tmp>`, then `GIT_INDEX_FILE=<tmp> git add -A`, then
+  `GIT_INDEX_FILE=<tmp> git diff --cached --binary HEAD > <patch>`, then delete `<tmp>`.
 
 ## 3. Review
 
-Dispatch two reviewers in parallel, each with `isolation: "worktree"`:
+Dispatch two reviewers in parallel, without `isolation: "worktree"`: that option creates a branch per
+agent that outlives the worktree. Each engine makes its own detached worktree instead, which leaves
+no branch behind.
 - Engine A runs `/code-review`, as Opus.
 - Engine B runs `/simplify`, as Sonnet.
 
-Say one line per agent when you launch them.
+Say one line per agent when you launch them. A report of an agent that an engine started can reach
+you directly; count each finding once. When both engines have reported, run `git worktree prune`,
+and remove an engine worktree that `git worktree list` still shows with
+`git worktree remove --force <path>`.
 
 Give each reviewer only this, and no description of the change, no suspicion and no hint where to
 look:
-- the scope start, the patch path and the original HEAD;
+- the repo root, its own worktree path in the scratchpad (`<scratchpad>/review-a` or `review-b`),
+  the scope start, the patch path and the original HEAD;
 - the doc pointers: the repo's `CLAUDE.md`, `AGENTS.md` and `ARCHITECTURE.md`, whose deliberate
   choices are not findings;
 - every ledger entry, each marked "do not report again" with its status and reason. A `fixed` entry
   that is broken again is reported as a regression of that ID.
 
-Tell each reviewer to do these steps in its worktree:
-1. Prepare the scope as the current diff: `git reset -q <scope start>`, then
-   `git apply --allow-empty --binary <patch>`. HEAD is now the scope start, and the whole scope is
-   unstaged. The reset must come after the worktree is at the original HEAD and must keep the
-   working tree (no `--hard`), because the patch is taken against the original HEAD.
+Tell each reviewer to do these steps, and to work only in its own worktree, never in the repo root:
+1. Prepare the scope as the current diff:
+   - `git -C <repo root> worktree add -q --detach <worktree> <original HEAD>`. All further
+     commands run inside `<worktree>`.
+   - `git reset -q -N <scope start>`: no `--hard`, because the patch is taken against the original
+     HEAD. `-N` keeps files that the branch added visible to `git diff`.
+   - `git apply --allow-empty --binary <patch>`, then `git add -N .`, so the new files of the patch
+     show in `git diff` too. Do not use `git apply --intent-to-add`: it breaks the changed files.
+
+   HEAD is now the scope start, and the whole scope is unstaged.
 2. Engine A:
    - Invoke the Skill `code-review` with the args `high`.
    - Never pass `--fix` or `--comment`. Do not call ReportFindings or AskUserQuestion.
    - In a delta round, also read the callers and callees of every changed function, and the code
      that relies on the changed behaviour, and report what the change breaks there.
 3. Engine B:
-   - Record the baseline with `B=$(git stash create)` (this leaves the tree as it is).
+   - Record the baseline as a tree through a temporary index, because `git stash create` fails on
+     files marked intent-to-add: `GIT_INDEX_FILE=<tmp> git add -A`, then
+     `B=$(GIT_INDEX_FILE=<tmp> git write-tree)`, then delete `<tmp>`.
    - Invoke the Skill `simplify` and let it apply its changes.
-   - Each hunk of `git diff $B` is one finding, with its diff as the fix.
-4. Restore: `git reset -q --hard <original HEAD> && git clean -fdq`, so the worktree is removed.
-5. Return the findings as text: `file:line` (in the scope's code, not the worktree path), the
+   - Run `git add -N .`, then take `git diff $B`. Each hunk is one finding, with its diff as the fix.
+4. When the invoked skill starts agents, wait for every result before you go on. Never end your turn
+   while an agent you started still runs: its report would reach the main session instead of you.
+5. Remove the worktree: `git -C <repo root> worktree remove --force <worktree>`.
+6. Return the findings as text: `file:line` (in the scope's code, not the worktree path), the
    defect, the evidence or failure scenario, and the fix.
-6. If the Skill cannot be invoked or cannot review the prepared diff, review the same diff along the
+7. If the Skill cannot be invoked or cannot review the prepared diff, review the same diff along the
    same dimension yourself and say so in the first line.
 
 Then dispatch one verifier (Opus), and a second one above about 8 findings. Give it the findings
@@ -82,7 +103,7 @@ Done when every surviving finding has a confirmed `file:line`, a verdict and a c
 ## 4. Decide
 
 - Give the new findings the next free IDs and report them with ReportFindings, most severe first,
-  with the verifier's verdict. Then ask which to fix (AskUserQuestion, multiSelect). Record each
+  with the verifier's verdict. A regression keeps its old ID: set that entry back to `open`. Then ask which to fix (AskUserQuestion, multiSelect). Record each
   answer in the ledger now.
 - When I reject a finding as intended design, propose the one line for `CLAUDE.md` or
   `ARCHITECTURE.md` that would have prevented it.

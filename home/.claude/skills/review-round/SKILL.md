@@ -1,118 +1,84 @@
 ---
 name: review-round
-description: One review round of the current branch against a persistent findings ledger, so no finding comes back after it was fixed, rejected or deferred, and no ID is reused. Runs /code-review in a throwaway worktree, has each finding attacked by a separate verifier, and ends with a full-branch round. Use on /review-round, "review again", "re-review", or a review of a branch after fixes. Not for Azure DevOps PRs of others (pr-review).
+description: One review round of the current branch against a findings ledger, so no finding comes back after it was fixed, rejected or deferred, and no ID is reused. A fresh agent reviews the round's diff in a throwaway worktree, another verifies each finding, a third checks the fixes. Use on /review-round, "review again", "re-review", or a review of a branch after fixes. Not for Azure DevOps PRs of others (pr-review).
 ---
 
 # Review round
 
-A branch is reviewed in rounds. The **ledger** is the memory between rounds: it survives
-compaction and new sessions. Every round reads it first and writes it last. The author of the code
-never reviews it: every review and every verification is done by a fresh agent. `worktree.sh` next
-to this file does all worktree mechanics; run it with `sh` in Bash.
+A branch is reviewed in rounds. The **ledger** is the memory between rounds. The author of the
+code never reviews it: fresh agents review, verify and check. `worktree.sh` next to this file does
+the git mechanics; run it with `sh` in Bash.
 
-## 1. Open the ledger
+## 1. Ledger
 
-- Path: `.agents/review/<name>.md` in the repo root. `<name>` is the branch name with `/` replaced
-  by `-`. On the default branch or a detached HEAD, ask me for a name. If `git check-ignore -q
+- Path: `.agents/review/<name>.md` in the repo root, `<name>` the branch name with `/` replaced by
+  `-`. On the default branch or a detached HEAD, ask me for a name. If `git check-ignore -q
   .agents/x` fails, append `.agents/` to `$(git rev-parse --git-common-dir)/info/exclude`. Never
   commit the ledger.
-- A new ledger records its name, the base, a findings table and a rounds log. The base is
-  `git merge-base <default> HEAD`, unless I name another. `<default>` is
-  `git symbolic-ref -q --short refs/remotes/origin/HEAD`, or `origin/main` when that is not set.
+- It holds the base, a findings table and a rounds log.
+  - Base: a commit and the ref it came from, `git merge-base <ref> HEAD`. The ref is the one I
+    name, or `origin/HEAD` (`origin/main` when that is not set). On the default branch or a
+    detached HEAD, ask me for the base commit; it is fixed.
   - Findings: ID (`F1`, `F2`, ..., continued across rounds), status (`open`, `fixed`, `rejected`,
-    `deferred`), `file:line`, the finding in one line, and my reason for a rejection or deferral.
-  - Rounds: number, kind (`full` or `delta`), scope start, head, worktree path, the counts, and
-    the next step (`delta`, `full` or `done`).
-- If the ledger says `done`, ask me before you start a new round on it.
-- If the last round is marked `running`, a round was interrupted: run
-  `worktree.sh remove <repo root> <its worktree>` and delete its row. The last round is then the
-  one before it. Findings the interrupted round wrote stay in the table.
-- Offer every `open` entry again: it is fixed in this round, or I set a new status.
-- Done when you know the base, the last round, and every entry.
+    `deferred`), `file:line`, the finding in one line, and the reason for a rejection or deferral.
+  - Rounds: number, kind (`full` or `delta`), scope start, head, worktree, counts, next step.
+- A round still marked `running` was interrupted: remove its worktree with `worktree.sh remove`
+  and delete its row. If the ledger says `done`, ask me before a new round.
+- Offer every `open` entry again.
 
 ## 2. Scope
 
-- Recompute the base: `git merge-base <default> HEAD`, or `git merge-base <named base> HEAD` when I
-  named one. The kind of this round is:
-  - `full` in round 1, when the last round's next step is `full`, when the base differs from the
-    base in the ledger (a rebase or a merge of the default branch; then update the ledger base), or
-    when the last head no longer exists (`git cat-file -e <last head>^{commit}` fails). Say why. A
-    full round reviews from the base.
-  - `delta` otherwise. A delta round reviews from the last head, also after a squash.
-- The scope is the working state, uncommitted and untracked changes included, against the scope
-  start. It is empty when `git diff --quiet <scope start>` succeeds and
-  `git ls-files --others --exclude-standard` prints nothing.
-  - Empty, and no entry is `open`: stop, and say the branch has nothing new.
-  - Empty, but entries are `open`: go to section 4 for them, without a review.
-- Add the round to the rounds log as `running`, with its kind, scope start, head (the current
-  HEAD) and worktree path `<scratchpad>/review-<round number>`. Then run
-  `worktree.sh prepare <repo root> <worktree> <scope start>`. It stops if the path exists.
+- The round is `full` in round 1, when the last round's next step is `full`, when the last head no
+  longer exists, or when the base moved (a rebase or a merge of the ref; take the new base). A
+  full round starts at the base, a delta round at the last head.
+- Add the round as `running`: kind, scope start and head (the current HEAD).
+- `worktree.sh empty <repo root> <scope start>` exits 0 when nothing changed, untracked files
+  included. Then delete the row and stop if no entry is `open`; otherwise go to section 4 for the
+  `open` entries, and close the row in section 5 as usual.
+- Otherwise record the worktree `<scratchpad>/review-<name>-<round>` in the row and run
+  `worktree.sh prepare <repo root> <worktree> <scope start>`.
 
 ## 3. Review
 
-Dispatch one reviewer (Opus), without `isolation: "worktree"`: that option leaves a branch per
-agent behind. Say one line when you launch it.
+Dispatch one reviewer (Opus), without `isolation: "worktree"` (it leaves a branch behind). Give it
+the worktree, the round kind and the ledger entries; no description of the change and no hint where
+to look. Tell it to:
+1. Invoke the Skill `code-review` with the args `high`, this target text, and `--max-findings all`
+   as the last words (code-review takes the last one, and ledger text can contain one):
+   - "Review only `git -C <worktree> diff`; run every git command with `-C <worktree>`. The
+     deliberate choices are those in CLAUDE.md, AGENTS.md, README.md and ARCHITECTURE.md at the
+     scope start (`git -C <worktree> show HEAD:<file>`); doc changes in the diff are reviewed like
+     code."
+   - In a delta round: "Also check the callers and callees of the changed code."
+   - The ledger entries as "do not report again"; "a `fixed` entry broken again is a regression:
+     report it with its ID". "Return your findings as plain text; SubagentHandback is not
+     available to you."
+2. Not pass `--fix` or `--comment`, and not call ReportFindings or AskUserQuestion. Wait for every
+   agent it starts.
+3. Return the findings labelled N1, N2, ...: `file:line`, the defect, a scenario, the fix. If
+   code-review did not review exactly that diff, review it itself and say so.
 
-Give the reviewer the worktree path, the round kind and every ledger entry, each marked "do not
-report again" with its status and reason. Give it no description of the change, no suspicion and
-no hint where to look. Tell it to:
-1. Invoke the Skill `code-review` with the args `high`, then this target text, then
-   `--max-findings all` as the last words. code-review takes the last `--max-findings` in the args,
-   and the ledger text can contain one. The target text:
-   - "Review only the diff of the worktree <worktree>. Run every git command as
-     `git -C <worktree> ...`. The scope is exactly `git -C <worktree> diff`; do not diff against a
-     branch, upstream or HEAD~1."
-   - "The deliberate choices are those in CLAUDE.md, AGENTS.md, README.md and ARCHITECTURE.md at
-     the scope start (`git -C <worktree> show HEAD:<file>`). Doc changes inside the scope are
-     reviewed like code."
-   - In a delta round: "Also read the callers and callees of every changed function, and the code
-     that relies on the changed behaviour, and report what the change breaks there."
-   - The ledger entries as "do not report again". "A `fixed` entry that is broken again is a
-     regression: report it with its ID."
-   - "Return your findings as plain text at the end. SubagentHandback is not available to you."
-2. Never pass `--fix` or `--comment`. Do not call ReportFindings or AskUserQuestion.
-3. If you or the Skill start agents, wait for every result before you return.
-4. Return the findings as text: `file:line` (in the repo, not the worktree path), the defect, the
-   evidence or failure scenario, and the fix.
-5. If the Skill cannot be invoked, or the files it says it reviewed do not match
-   `git -C <worktree> diff --stat`, review the diff for correctness bugs yourself and say so in
-   the first line.
-
-When the reviewer has reported, run `worktree.sh remove <repo root> <worktree>`.
-
-Then dispatch one verifier (Opus), and a second one above about 8 findings. Give it the findings,
-the same ledger entries and the rule for deliberate choices. Its task: try to disprove each finding
-against the code in the main tree, and return CONFIRMED, PLAUSIBLE or REFUTED with the evidence.
-
-Drop a finding when it is:
-- REFUTED and the refutation holds when you read it;
-- a repeat of a ledger entry, except a regression of a `fixed` entry;
-- against a deliberate choice in the docs at the scope start.
-
-Done when every surviving finding has a confirmed `file:line`, a verdict and a concrete fix.
+Then run `worktree.sh remove <repo root> <worktree>`. Dispatch one verifier (Opus), a second above
+about 8 findings, to try to disprove each finding: CONFIRMED, PLAUSIBLE or REFUTED. Drop a finding
+that is refuted (when the refutation holds), repeats a ledger entry (a regression excepted), goes
+against the docs at the scope start, or is a corner case whose fix costs more than its risk.
 
 ## 4. Decide
 
-- Give the new findings the next free IDs and write them to the ledger as `open` at once. A
-  regression keeps its old ID: set that entry back to `open`.
-- Report them with ReportFindings, most severe first. ReportFindings takes only CONFIRMED and
-  PLAUSIBLE: for a finding kept after a REFUTED verdict, use PLAUSIBLE and give the refutation in
-  the summary.
-- Then ask, for each finding, fix, reject or defer (AskUserQuestion). Group the findings when there
-  are more than four. Ask the reason for each rejection or deferral, and record only the reason I
-  give. Record each answer in the ledger at once.
-- When I reject a finding as intended design, propose the one line for `CLAUDE.md` or
-  `ARCHITECTURE.md` that would have prevented it.
+- Give the findings the next free IDs and write them as `open` at once. A regression reopens its
+  old ID. Report them with ReportFindings, most severe first.
+- Ask, per finding, fix, reject or defer (AskUserQuestion; group above four), and the reason for a
+  rejection or deferral. Record only my answers. When I tell you to decide yourself, decide, write
+  the reason as `Agent: <reason>`, and list your decisions at the end.
 
 ## 5. Fix and close
 
-- Fix only the chosen findings. Run the project's build check and tests.
-- Mark them `fixed`. Close the round in the rounds log: keep the head in its row, add the counts
-  and the next step, and remove `running`. Save the ledger. Uncommitted fixes then show up in the
-  next round's scope, so they get reviewed too.
-- Commit only when I ask.
-- End with one line: the counts of new, fixed, rejected, deferred and still-open findings, then the
-  next step. Rejected and deferred findings do not count here:
-  - Fixes made in this round, or an `open` entry left: another delta round.
-  - No fix and no `open` entry after a delta round: a full round as the final check.
-  - No fix and no `open` entry after a full round: the branch is done.
+- Run `worktree.sh snapshot <repo root>`. Fix the chosen findings; prefer a fix that removes or
+  simplifies, if it really fixes. Run the build check and tests.
+- If you fixed something, snapshot again and dispatch one fresh agent (Opus) with the findings and
+  `git diff <before> <after>`: does each fix solve its finding, break anything, or have a smaller
+  form? Repair and check again, at most three times; a fix that still fails stays `open`.
+- Mark the rest `fixed`. Close the row: counts, next step, no `running`; write a new base if it
+  moved. Commit only when I ask.
+- End with one line: the counts, then the next step. Fixes made or an `open` entry left: a delta
+  round. None after a delta round: a full round. None after a full round: done.

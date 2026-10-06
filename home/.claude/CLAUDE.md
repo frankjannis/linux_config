@@ -61,6 +61,12 @@ answer: the facts, then the options with their trade-offs. Change code only when
   whole must build and pass. Do not split or reorder commits to make each one green.
 - Keep commit messages short. The diff carries the detail.
 
+## PR reviews
+- When I review or watch a PR of someone else, tell me when I can approve it. That is when all
+  your finding threads are resolved (you verified each fix) and the newest build is green. Start
+  that message with "Ready to approve: !NNNN" and list what you did not verify. Do not start
+  polling only for this.
+
 ## Models
 - When you run as Fable, dispatch subagents as Opus, or Sonnet for light lookups, whenever that is
   enough. Fable is far more expensive. Use Fable subagents only for work that needs Fable.

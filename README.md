@@ -48,17 +48,26 @@ tmux source-file ~/.config/tmux/tmux.conf
 ```
 
 ## Windows
-`install.sh` is Linux only, and the Linux configs are not used on Windows. The one file worth
-linking there is the global Claude config. In an **admin** PowerShell (or with Developer Mode
-on), run from the repo root:
+`install.sh` is Linux only, and the Linux configs are not used on Windows. The files worth
+linking there are the Claude config under `home/.claude` (the global `CLAUDE.md` and the skills).
+In an **admin** PowerShell (or with Developer Mode on), run from the repo root:
 ```powershell
-$dst="$HOME\.claude\CLAUDE.md"; $src="$PWD\home\.claude\CLAUDE.md"; New-Item -ItemType Directory -Force "$HOME\.claude" | Out-Null; $probe="$HOME\.claude\.symlink_probe"; New-Item -ItemType SymbolicLink -Path $probe -Target $src -ErrorAction Stop | Out-Null; Remove-Item $probe; $cur=Get-Item $dst -ErrorAction SilentlyContinue; if ($cur -and -not $cur.LinkType) { Move-Item -Force $dst $src } elseif ($cur) { Remove-Item $dst }; New-Item -ItemType SymbolicLink -Path $dst -Target $src
+$repo="$PWD\home\.claude"; $home_claude="$HOME\.claude"
+New-Item -ItemType Directory -Force $home_claude | Out-Null
+$probe="$home_claude\.symlink_probe"; New-Item -ItemType SymbolicLink -Path $probe -Target "$repo\CLAUDE.md" -ErrorAction Stop | Out-Null; Remove-Item $probe
+Get-ChildItem -Recurse -File $repo | ForEach-Object {
+    $src=$_.FullName; $dst=$home_claude + $src.Substring($repo.Length)
+    New-Item -ItemType Directory -Force (Split-Path $dst) | Out-Null
+    $cur=Get-Item $dst -ErrorAction SilentlyContinue
+    if ($cur -and -not $cur.LinkType) { Move-Item -Force $dst $src } elseif ($cur) { Remove-Item $dst }
+    New-Item -ItemType SymbolicLink -Path $dst -Target $src | Out-Null
+}
 ```
-Like the Linux installer, this adopts: an existing `~/.claude/CLAUDE.md` is moved over the repo
-copy, then replaced by the link. Review or drop the adopted content with git in the repo
+Like the Linux installer, it links per file and adopts: an existing real file is moved over the
+repo copy, then replaced by the link. Review or drop the adopted content with git in the repo
 (`git diff`, `git restore`). It first probes that symlink creation works, so if you are not in
-an admin shell it stops before moving anything. On Linux the same file is linked by
-`install.sh` via the `home/` root.
+an admin shell it stops before moving anything. Re-running is safe. On Linux the same files are
+linked by `install.sh` via the `home/` root.
 
 ## Notes
 - `fish_variables` is tracked and linked. fish rewrites it at runtime through the link, so

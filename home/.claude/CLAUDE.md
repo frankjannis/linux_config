@@ -16,20 +16,27 @@ Ask when both are true:
 Do not ask about small decisions. Choose the sensible default, say what you chose, and continue.
 Ask with the AskUserQuestion tool. While you wait, do the parts that do not depend on the answer.
 
+A question is not a change request. "Why not X?", in the chat or in a review thread, gets an
+answer: the facts, then the options with their trade-offs. Change code only when I say so.
+
 ## Language and style
 - Write in Simplified Technical English (ASD-STE100): short sentences, plain words, one idea per sentence.
 - No em-dashes. No emojis. This applies to prose, code, comments, and commit messages.
 - Prefix each review finding, question, or item I may refer to later with a unique ID (F1, Q1, ...).
   I need these IDs to tell you what to do. Put the ID in every field I see. For the ReportFindings
-  tool, the table shows `short_summary`, so start it with the ID ("F1: ...").
+  tool, the table shows `short_summary`, so start it with the ID ("F1: ..."). It holds at most 60
+  characters, the ID included.
 - Present choices with the AskUserQuestion tool, never as a free-text option list.
+- Text I paste elsewhere (PR title and description, commit message, reply draft) goes in the chat
+  as one fenced markdown block. Not rendered, not a file.
 - Reviews and walkthroughs: order sections top-down by altitude. Keystone decision, then interfaces
   and seams, then the effect on consumers, then detail and tests.
 
 ## Code
 - KISS. Reduce noise. Prefer the shared solution, but do not over-apply DRY; a few repeated lines are
   fine when they read better.
-- Comment only tricky code. No section comments. No comments that repeat what the code says.
+- Comment only tricky code: the why that the code cannot show, in one line. No section comments.
+  No comments that repeat what the code says.
 
 ## Project rules and documentation
 - Read `AGENTS.md`, `README.md`, and `ARCHITECTURE.md` first. They extend this file. After a change,
@@ -46,13 +53,13 @@ Ask with the AskUserQuestion tool. While you wait, do the parts that do not depe
 
 ## Git
 - Never add Claude as author or co-author. No `Co-Authored-By` trailer, no "Generated with Claude" footer.
-- Branches and PRs are mine. Never create, switch, merge, push, delete, or rename a branch. Never open
-  or manage a PR. Do not ask to.
+- Commit, amend, push, force-push, and create or switch a branch only when I ask for it in the
+  current message. Do not offer it. One "commit" means one commit.
+- Branches and PRs are mine. Never merge, delete, or rename a branch. Never open or manage a PR.
 - Squash same-topic and fixup commits. Keep the minimum number of commits that separates concerns.
-  Do not otherwise amend or rewrite existing commits unless I ask. One "commit" means one commit.
 - Single commits on a branch do not have to build or pass tests on their own. Only the branch as a
   whole must build and pass. Do not split or reorder commits to make each one green.
-- Keep commit messages short. The diff carries the detail. I handle force pushes.
+- Keep commit messages short. The diff carries the detail.
 
 ## Models
 - When you run as Fable, dispatch subagents as Opus, or Sonnet for light lookups, whenever that is

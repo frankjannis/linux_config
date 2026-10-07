@@ -1,6 +1,6 @@
 ---
 name: review-round
-description: One review round of the current branch against a findings ledger, so no finding comes back after it was fixed, rejected or deferred, and no ID is reused. code-review checks the round's diff in a throwaway worktree, a fresh agent verifies each finding, another checks the fixes. Use on /review-round, "review again", "re-review", or a review of a branch after fixes. Not for Azure DevOps PRs of others (pr-review).
+description: One review round of the current branch against a findings ledger, so no finding comes back after it was fixed, rejected or deferred, and no ID is reused. A fresh agent runs code-review on the round's diff in a throwaway worktree, another verifies each finding, a third checks the fixes. Use on /review-round, "review again", "re-review", or a review of a branch after fixes. Not for Azure DevOps PRs of others (pr-review).
 ---
 
 # Review round
@@ -39,19 +39,22 @@ does the git mechanics (run it with `sh`) and `ledger.py` reads and writes the l
 
 ## 3. Review
 
-Invoke the Skill `code-review` yourself; it runs as a background agent with its own context, so
-the author still does not review. Give it no description of the change and no hint where to look.
-Pass the args `<effort>`, this target text, and `--max-findings all` as the last words (code-review
-takes the last one, and ledger text can contain one); never `--fix` or `--comment`:
+Dispatch one reviewer (Opus), without `isolation: "worktree"` (it leaves a branch behind). Do not
+invoke code-review yourself: called by a model, it runs in the caller's context, so the author
+would review. Give the reviewer no description of the change and no hint where to look. Tell it to
+invoke the Skill `code-review` with the args `<effort>`, this target text, and
+`--max-findings all` as the last words (code-review takes the last one, and ledger text can
+contain one); never `--fix` or `--comment`, and no ReportFindings or AskUserQuestion:
 - "Review only `git -C <worktree> diff`; run every git command with `-C <worktree>`. The
   deliberate choices are those in CLAUDE.md, AGENTS.md, README.md and ARCHITECTURE.md at the scope
   start (`git -C <worktree> show HEAD:<file>`); doc changes in the diff are reviewed like code.
   Give a fix for each finding."
 - In a delta round: "Also check the callers and callees of the changed code."
 - The ledger entries as "do not report again"; "a `fixed` entry broken again is a regression:
-  report it with its ID".
+  report it with its ID". "Return your findings as plain text; SubagentHandback is not available
+  to you."
 
-Wait for its result and label the findings N1, N2, ...; they are not verified yet.
+It returns the findings labelled N1, N2, ...; they are not verified yet.
 
 Then run `worktree.sh remove <repo root> <worktree>`. Dispatch one verifier (Opus) at every effort
 level, and a second above about 8 findings: code-review has no documented verify step, and from

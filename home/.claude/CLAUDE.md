@@ -68,7 +68,17 @@ answer: the facts, then the options with their trade-offs. Change code only when
   polling only for this.
 
 ## Models
-- When you run as Fable, dispatch subagents as Opus, or Sonnet for light lookups, whenever that is
-  enough. Fable is far more expensive. Use Fable subagents only for work that needs Fable.
+- Delegate to a faster, cheaper model when it is enough. From Fable: Opus for real work, Sonnet for
+  lookups. From Opus: Sonnet for searches and mechanical edits, Haiku for single-fact lookups. Keep
+  judgment work (design, review verdicts, hard bugs) on the current model.
+- Delegate only self-contained tasks with a small result. If the brief is longer than the work, do
+  the work yourself, or use a fork when the task needs the current context.
+- Parallelize reads (search, research, review). Keep writes in one agent. Parallel editors only on
+  separate files or worktrees.
+- A brief states the objective, the output format, the tools or sources, and when the task is done.
+  Restate the rules the subagent must follow. It does not see this conversation, and Explore and Plan
+  skip CLAUDE.md.
+- Run independent subagents in parallel, in one message. A fan-out of more than 3 agents follows
+  "Ask before you spend tokens".
 - When you launch subagents, give me one line per agent: the agent type, the model, and the task in
   a few words. Say it when you launch them, not only at the end.

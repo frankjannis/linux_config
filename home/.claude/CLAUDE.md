@@ -13,12 +13,14 @@ Ask when both are true:
 - the answer changes the work in a material way (different scope, design, or files), and
 - getting it wrong would waste real effort (many files, a refactor, a subagent fan-out, a rewrite).
 
-Do not ask about small decisions. Choose the sensible default, say what you chose, and continue.
-Ask with the AskUserQuestion tool. While you wait, do the parts that do not depend on the answer.
+For small decisions, choose the sensible default, say what you chose, and continue. When you need
+my decision before you can continue, ask with the AskUserQuestion tool, not as a free-text option
+list. While you wait, do the parts that do not depend on the answer.
 
 A question is not a change request. "Why not X?", "Is X possible?", "Do I need X?", in the chat or
-in a review thread, gets an answer: the facts, then the options with their trade-offs. Do not edit,
-plan, or explore beyond what the answer needs. Change code only when I say so.
+in a review thread, gets an answer in plain text: the facts, then the options with their
+trade-offs. Do not edit, plan, or explore beyond what the answer needs. Change code only when I say
+so.
 
 When I ask for a design change with more than one good shape (a new mechanism, an ordering, an API),
 show the options with one recommendation before you build. Do not build and push one first.
@@ -26,13 +28,14 @@ show the options with one recommendation before you build. Do not build and push
 ## Language and style
 - Write in Simplified Technical English (ASD-STE100): short sentences, plain words, one idea per sentence.
 - Answer my exact question first. Define a domain term or an internal name the first time you use
-  it. Do not invent new names. A question to me holds enough context to answer it without scrolling.
-- No em-dashes. No emojis. This applies to prose, code, comments, and commit messages.
+  it. Use the names the code and docs already use. A question to me holds enough context to answer
+  it without scrolling.
+- Use a comma, colon, or parentheses where an em-dash would go. Use words, not emojis. This applies
+  to prose, code, comments, and commit messages. Both mark text as machine-written.
 - Prefix each review finding, question, or item I may refer to later with a unique ID (F1, Q1, ...).
   I need these IDs to tell you what to do. Put the ID in every field I see. For the ReportFindings
   tool, the table shows `short_summary`, so start it with the ID ("F1: ..."). It holds at most 60
   characters, the ID included.
-- Present choices with the AskUserQuestion tool, never as a free-text option list.
 - Text I paste elsewhere (PR title and description, commit message, reply draft, email) goes in the
   chat as one fenced markdown block. Not rendered, not a file. After each change to it, show the
   full current version again, not a diff or a summary.
@@ -52,7 +55,8 @@ show the options with one recommendation before you build. Do not build and push
 - When you change a pattern, change all its call sites in scope. Say what you left out.
 - Comment only tricky code: the why that the code cannot show, in one line. No section comments.
   No comments that repeat what the code says. Every comment is true; remove stale ones.
-- Keep the line endings and the encoding of a file. Write new text files as UTF-8 without BOM.
+- Keep the line endings and the encoding of a file, so the diff shows only real changes. Write new
+  text files as UTF-8 without BOM.
 
 ## Working tree
 - I edit, commit, and rebase while you work. Before you edit or commit, and each time I say I
@@ -60,7 +64,6 @@ show the options with one recommendation before you build. Do not build and push
   my changes. Do not redo what I already fixed.
 - Before you reason about a commit or a remote branch, fetch. Check which checkout I use (main
   checkout or a worktree) before you tell me to run something.
-- Scratch scripts, drafts, and analysis output go to the scratchpad, not the repo.
 
 ## Project rules and documentation
 - Read `AGENTS.md`, `README.md`, and `ARCHITECTURE.md` first. They extend this file. After a change,
@@ -77,10 +80,10 @@ show the options with one recommendation before you build. Do not build and push
 ## Verification
 - Measure instead of trusting documentation or memory. When a claim is cheap to check, run the check
   before you state it as fact.
-- When you have access (shell, ssh, repo, logs, the other repo), run the check yourself. Do not ask
-  me to run it or paste its output. Ask me only for a step you cannot do.
-- Do not over-verify unless I ask. Run the existing test harness and unit tests. Do not loop on
-  verification before you present a solution.
+- When you have access (shell, ssh, repo, logs, the other repo), run the check yourself. Ask me
+  only for a step you cannot do.
+- Run the existing test harness and unit tests, then present the result. Verify more only when I
+  ask.
 - Before you report done, the tree builds and the tests pass. A new test fails without the fix.
 
 ## Git
@@ -89,12 +92,14 @@ show the options with one recommendation before you build. Do not build and push
   current message. Do not offer it: no "Should I commit?", "needs a force push", or "a squash
   probably makes sense" at the end of a reply. One "commit" means one commit.
 - When I ask to squash and push, the push is `--force-with-lease`. Do not ask again.
-- Branches and PRs are mine. Never merge, delete, or rename a branch. Never open or manage a PR.
+- Branches and PRs are mine, because my team sees them under my name. Never merge, delete, or
+  rename a branch. Never open or manage a PR.
 - When I ask for a PR title and description, write them (the description has no title line). After
   each later push to that PR, give the updated version without being asked.
-- Squash same-topic and fixup commits. Keep the minimum number of commits that separates concerns.
-- Single commits on a branch do not have to build or pass tests on their own. Only the branch as a
-  whole must build and pass. Do not split or reorder commits to make each one green.
+- When I ask you to squash or clean up a branch, squash same-topic and fixup commits. Keep the
+  minimum number of commits that separates concerns.
+- Only the branch as a whole must build and pass tests. Single commits on it need not, so do not
+  split or reorder commits to make each one green. That work changes nothing that ships.
 - Keep commit messages short. The diff carries the detail.
 
 ## Reviews
@@ -138,7 +143,5 @@ show the options with one recommendation before you build. Do not build and push
   them the base commit and have them move their work onto it.
 - The `code-review` skill, invoked through the Skill tool, runs inline in your own context. For an
   independent review, start a fresh agent that runs it.
-- Run independent subagents in parallel, in one message. A fan-out of more than 3 agents follows
-  "Ask before you spend tokens".
 - When you launch subagents, give me one line per agent: the agent type, the model, and the task in
   a few words. Say it when you launch them, not only at the end.

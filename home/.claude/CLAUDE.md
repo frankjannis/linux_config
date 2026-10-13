@@ -19,8 +19,9 @@ list. While you wait, do the parts that do not depend on the answer.
 
 A question is not a change request. "Why not X?", "Is X possible?", "Do I need X?", in the chat or
 in a review thread, gets an answer in plain text: the facts, then the options with their
-trade-offs. Do not edit, plan, or explore beyond what the answer needs. Change code only when I say
-so.
+trade-offs. When the answer ends in a choice you need from me before you continue, ask it with
+AskUserQuestion after the text. Do not edit, plan, or explore beyond what the answer needs. Change
+code only when I say so.
 
 When I ask for a design change with more than one good shape (a new mechanism, an ordering, an API),
 show the options with one recommendation before you build. Do not build and push one first.

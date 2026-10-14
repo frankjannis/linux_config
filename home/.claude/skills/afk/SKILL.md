@@ -118,9 +118,9 @@ loop stops on a guard, notify the user as in the contract.
 
 ## Resuming
 When the user says **tadaima** (or otherwise signals they are back), stop deferring
-and end any goal loop. Report the goal result from `.agents/afk-goal.md` in one line,
-then walk them through `.agents/deferred-questions.md` top to bottom by ID, get their
-answers, and apply them.
+and end any goal loop. Invoke the `missed` skill. Report the goal result from
+`.agents/afk-goal.md` in one line, then walk them through
+`.agents/deferred-questions.md` top to bottom by ID, get their answers, and apply them.
 
 ## Arguments
 `/afk [resume-word] [note]` - all optional. A custom resume word replaces "tadaima"

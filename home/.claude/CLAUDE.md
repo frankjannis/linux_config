@@ -53,6 +53,9 @@ show the options with one recommendation before you build. Do not build and push
 - Make the smallest change that does what I asked. No extra flags, fallbacks, backup files, checks,
   config, or tools that I did not ask for. Fix problems that were seen; do not guard against cases
   with no evidence. If a refactor reads worse than the code before, revert it.
+- Simplicity beats efficiency. Keep an efficiency change only when a measurement shows its gain;
+  otherwise take the simpler form. Reviews look for both: needless work (an allocation on every
+  drop) and needless code.
 - A cleanup does not remove asserts, safeguards, or useful comments without a reason it can state.
 - When you change a pattern, change all its call sites in scope. Say what you left out.
 - Comment only tricky code: the why that the code cannot show, in one line. No section comments.

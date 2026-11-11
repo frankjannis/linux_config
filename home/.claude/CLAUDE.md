@@ -44,7 +44,8 @@ show the options with one recommendation before you build. Do not build and push
   reasoning and setup detail. Every claim in it has a source.
 - Reviews and walkthroughs: order sections top-down by altitude. Keystone decision, then interfaces
   and seams, then the effect on consumers, then detail and tests.
-- For work that runs longer than a few minutes, say what runs and when you expect it to end.
+- For work that runs longer than about 5 minutes (a test, a build, a deploy), say what runs and
+  when you expect it to end, as a clock time in my local timezone, not as a duration or in UTC.
 
 ## Code
 - KISS. Reduce noise. Prefer the shared solution, but do not over-apply DRY; a few repeated lines are

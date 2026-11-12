@@ -37,7 +37,7 @@ show the options with one recommendation before you build. Do not build and push
   I need these IDs to tell you what to do. Put the ID in every field I see. For the ReportFindings
   tool, the table shows `short_summary`, so start it with the ID ("F1: ..."). It holds at most 60
   characters, the ID included.
-- Text I paste elsewhere (PR title and description, commit message, reply draft, email) goes in the
+- Text I paste elsewhere (commit message, reply draft, email) goes in the
   chat as one fenced markdown block. Not rendered, not a file. After each change to it, show the
   full current version again, not a diff or a summary.
 - Text for outside readers (customers, vendors, colleagues) is short. Leave out our internal
@@ -102,9 +102,9 @@ show the options with one recommendation before you build. Do not build and push
   conflicts) you do and push yourself; for one with conflicts, tell me and we decide when. Before
   each push, build and run the tests, so the pushed head builds and passes them.
 - Branches and PRs are mine, because my team sees them under my name. Never merge, delete, or
-  rename a branch. Never open or manage a PR.
-- When I ask for a PR title and description, write them (the description has no title line). After
-  each later push to that PR, give the updated version without being asked.
+  rename a branch. Open or update a PR only when I ask.
+- When I ask to push to a PR, update its title and description in the same step if they no
+  longer match. The description has no title line.
 - When I ask you to squash or clean up a branch, squash same-topic and fixup commits. Keep the
   minimum number of commits that separates concerns.
 - Only the branch as a whole must build and pass tests. Single commits on it need not, so do not
@@ -119,7 +119,7 @@ show the options with one recommendation before you build. Do not build and push
 - Prefer to reject or defer a corner case with no evidence over adding code for it.
 
 ## PR reviews
-- Before you post on an Azure DevOps PR, read all existing threads and filter by author. Drop the
+- Before you post on a PR, read all existing threads and filter by author. Drop the
   findings that are already there. Diff against `git merge-base`, not the tip of the target branch.
 - When I say "post", post at once. No extra preview round.
 - Change the status of a review thread (resolve, close, won't fix) only for the threads I name.

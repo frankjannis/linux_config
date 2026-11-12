@@ -97,6 +97,10 @@ show the options with one recommendation before you build. Do not build and push
   current message. Do not offer it: no "Should I commit?", "needs a force push", or "a squash
   probably makes sense" at the end of a reply. One "commit" means one commit.
 - When I ask to squash and push, the push is `--force-with-lease`. Do not ask again.
+- An MR or PR in review or a later stage stays ready to merge. Squash its commits as the topics
+  need, so no fixup or churn commit is pushed. When its target moves, a trivial rebase (no
+  conflicts) you do and push yourself; for one with conflicts, tell me and we decide when. Before
+  each push, build and run the tests, so the pushed head builds and passes them.
 - Branches and PRs are mine, because my team sees them under my name. Never merge, delete, or
   rename a branch. Never open or manage a PR.
 - When I ask for a PR title and description, write them (the description has no title line). After

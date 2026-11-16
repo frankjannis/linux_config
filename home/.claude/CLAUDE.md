@@ -106,8 +106,8 @@ show the options with one recommendation before you build. Do not build and push
 - Keep an MR you work on updated: after each change I accept, build and test, squash it into the
   MR's commits, push with `--force-with-lease`, and update the title, the description and the
   linked work item. This needs no new ask.
-- Branches and PRs are mine, because my team sees them under my name. Never merge, delete, or
-  rename a branch. Open a PR only when I ask.
+- Branches and PRs are mine, because my team sees them under my name. Never merge or rename a
+  branch. Delete a branch only when it is merged into its target. Open a PR only when I ask.
 - When I ask to push to a PR, update its title and description in the same step if they no
   longer match. The description has no title line.
 - When I ask you to squash or clean up a branch, squash same-topic and fixup commits. Keep the
